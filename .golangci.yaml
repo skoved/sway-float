@@ -1,0 +1,132 @@
+# Copyright skoved
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+version: "2"
+linters:
+  default: none
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - asciicheck
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - dupword
+    - errorlint
+    - exhaustive
+    - exhaustruct
+    - fatcontext
+    - forcetypeassert
+    - gocheckcompilerdirectives
+    - gochecksumtype
+    - goconst
+    - godox
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - iface
+    - importas
+    - intrange
+    - ireturn
+    - lll
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - nilerr
+    - nolintlint
+    - nonamedreturns
+    - paralleltest
+    - perfsprint
+    - predeclared
+    - reassign
+    - recvcheck
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - usestdlibvars
+    - usetesting
+    - wastedassign
+    - whitespace
+    - wrapcheck
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+      exclude-functions:
+        - fmt.Fprintf
+        - fmt.Fprintln
+    goconst:
+      numbers: true
+      find-duplicates: true
+      eval-const-expressions: true
+    govet:
+      disable-all: true
+      enable:
+        - appends
+        - asmdecl
+        - assign
+        - atomic
+        - atomicalign  # not default
+        - bools
+        - buildtag
+        - cgocall
+        - composites
+        - copylocks
+        - deepequalerrors  # not default
+        - defers
+        - directive
+        - errorsas
+        - fieldalignment  # not default
+        - framepointer
+        - httpresponse
+        - ifaceassert
+        - loopclosure
+        - lostcancel
+        - nilfunc
+        - nilness  # not default
+        - printf
+        - reflectvaluecompare  # not default
+        - shadow  # not default
+        - shift
+        - sigchanyzer
+        - slog
+        - sortslice  # not default
+        - stdmethods
+        - stringintconv
+        - structtag
+        - testinggoroutine
+        - tests
+        - timeformat
+        - unmarshal
+        - unreachable
+        - unsafeptr
+        - unusedresult
+        - unusedwrite  # not default
+        - waitgroup
+    iface:
+      enable:
+        - identical
+        - unused
+        - opaque
+    importas:
+      no-extra-aliases: true
+    nonamedreturns:
+      report-error-in-defer: true
+    usetesting:
+      os-temp-dir: true
+    unused:
+      exported-fields-are-used: false
+      parameters-are-used: false
+      local-variables-are-used: false
+formatters:
+  enable:
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/skoved/sway-float

@@ -1,0 +1,6 @@
+{
+  "**/*.go": "// Copyright skoved\n// SPDX-License-Identifier: GPL-3.0-or-later",
+  "**/*.{yaml,yml,.yamllint}": "# Copyright skoved\n# SPDX-License-Identifier: GPL-3.0-or-later",
+  "**/*.sh": "#!/usr/bin/env bash\n# Copyright skoved\n# SPDX-License-Identifier: GPL-3.0-or-later",
+  "**/*.adoc": "// Copyright skoved\n// SPDX-License-Identifier: GPL-3.0-or-later"
+}

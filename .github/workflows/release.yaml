@@ -1,0 +1,40 @@
+# Copyright skoved
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+name: Release
+on:
+  push:
+    tags:
+      - "v*"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+permissions:
+  contents: write
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Test
+        run: |
+          set -x
+          go build
+          go test -v ./...
+          rm sway-float
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish Go Module
+        run: GOPROXY=proxy.golang.org go list -m github.com/${GITHUB_REPOSITORY}@${GITHUB_REF_NAME}
