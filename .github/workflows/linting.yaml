@@ -1,0 +1,99 @@
+# Copyright skoved
+# SPDX-License-Identifier: GPL-3.0-or-later
+---
+name: Linting
+run-name: Linting
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  go-mod-tidy:
+    name: Go Mod Tidy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Run go mod tidy
+        run: go mod tidy
+      - name: Fail if There Are Changes
+        run: |
+          set -x
+          # check if go.sum exists
+          if [ -f go.sum ]; then
+            git diff --exit-code go.sum
+          fi
+          git diff --exit-code go.mod
+  yamllint:
+    name: Yaml Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Run yamllint
+        uses: karancode/yamllint-github-action@master
+        with:
+          yamllint_comment: true
+        env:
+          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  golangci-lint:
+    name: Golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Display Go Version
+        run: go version
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: latest
+  check-license-headers:
+    name: Check License Headers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+      - name: Install License Checker
+        run: npm install --global @kt3k/license-checker
+      - name: Run License Checker
+        run: license_checker
+  regen-manpage:
+    name: Regenerate Manpages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4
+      - name: Setup Asciidoctor
+        uses: reitzig/actions-asciidoctor@v2.0.2
+      - name: Regen Manpage
+        run: |
+          set -x
+          if [ -d "man/" ]; then
+            asciidoctor -b manpage man/*.adoc
+          fi
