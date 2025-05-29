@@ -1,0 +1,11 @@
+[Unit]
+Description=run sway-float to make difficult windows floating
+Documentation=man:sway-float(1)
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/sway-float
+Restart=on-failure
+
+[Install]
+WantedBy=sway-session.target
