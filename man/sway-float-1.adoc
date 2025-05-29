@@ -1,0 +1,72 @@
+// Copyright skoved
+// SPDX-License-Identifier: GPL-3.0-or-later
+= sway-float(1)
+Sam Koved
+:doctype: manpage
+:manmanual: SWAY-FLOAT
+:mansource: SWAY-FLOAT
+:man-linkstyle: pass:[blue R < >]
+
+== Name
+
+sway-float - converts windows with specified criteria from tiled to floating
+
+== Synopsis
+
+*sway-float* [_OPTION_]...
+
+== Description
+
+*sway-float* uses sway-ipc to listen for window title changes. When a window matches the provided criteria, it sets that
+window to floating.
+
+== Options
+
+*-a, -app_id, --app_id*::
+  The app_id for the window. If it is not provided, any app_id will match.
+
+*-c, -con_mark, --con_mark*::
+  The con_mark for the window. If it is not provided, any con_mark will match.
+
+*-t, -title, --title*::
+  The title for the window. If it is not provided, any title will match.
+
+*-v, -version, --version*::
+  Print the version info.
+
+*-h, -help, --help*::
+  Print the help info.
+
+== Bugs
+
+If you encounter a bug with this software please open an issue on Github
+<https://github.com/skoved/sway-float/issues>
+
+== Example
+
+The following example loads app_id, con_mark, and title from the config.yaml file. +
+$ sway-float
+
+The following example provides app_id, con_mark, and title from the flags. +
+$ sway-float --app_id "org.mozilla.firefox" --con_mark browser --title "Some Title"
+
+== Copying
+
+Copyright (C) 2025 {author}. +
+
+This program is free software: you can redistribute it and/or modify +
+it under the terms of the GNU General Public License as published by +
+the Free Software Foundation, either version 3 of the License, or +
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful, +
+but WITHOUT ANY WARRANTY; without even the implied warranty of +
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the +
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License +
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+== See Also
+
+sway-float(5) sway-ipc(7) sway(1) sway(5)
