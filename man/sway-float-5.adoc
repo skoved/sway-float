@@ -1,0 +1,37 @@
+// Copyright skoved
+// SPDX-License-Identifier: GPL-3.0-or-later
+= sway-float(5)
+Sam Koved
+:doctype: manpage
+:manmanual: SWAY-FLOAT
+:mansource: SWAY-FLOAT
+:man-linkstyle: pass:[blue R < >]
+
+== Name
+
+sway-float - configuration file
+
+== Description
+
+*sway-float* uses a file that is located at $XDG_CONFIG_HOME/sway-float/config.yaml. If *$XDG_CONFIG_HOME* is not set,
+sway-float looks in .config/sway-float/config.yaml. If this path does not exist, then appropriate flags must be set on
+the commandline. Any of the options below can be omitted from config.yaml and *sway-float* will only match against the
+options that are defined. However, at least *one* option must be defined.
+
+== Options
+
+*app_id*: <application id> +
+  The app_id of the window you want to make floating. If this value is not defined, then *sway-float* will ignore the
+  app_id of windows.
+
+*con_mark*: <mark> +
+  The con_mark of the window you want to make floating. If this value is not defined, then *sway-floating* will ignore
+  the con_mark of windows.
+
+*title*: <title> +
+  The title of the window you want to make floating. If this value is not defined, then *sway-floating* will ignore the
+  title of windows.
+
+== See Also
+
+sway-float(1) sway-ipc(7) sway(1) sway(5)
