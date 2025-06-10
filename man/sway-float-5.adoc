@@ -16,7 +16,8 @@ sway-float - configuration file
 *sway-float* uses a file that is located at $XDG_CONFIG_HOME/sway-float/config.yaml. If *$XDG_CONFIG_HOME* is not set,
 sway-float looks in .config/sway-float/config.yaml. If this path does not exist, then appropriate flags must be set on
 the commandline. Any of the options below can be omitted from config.yaml and *sway-float* will only match against the
-options that are defined. However, at least *one* option must be defined.
+options that are defined. However, at least *one* option must be defined. config.yaml is a list of the following options
+in yaml format.
 
 == Options
 

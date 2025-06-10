@@ -119,7 +119,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	var conf floatConfig
+	var confs []floatConfig
 	configDir, confDirErr := os.UserConfigDir()
 	if confDirErr != nil {
 		errorExit(fmt.Errorf("could not determine the current user's config dir: %w", confDirErr))
@@ -132,11 +132,10 @@ func main() {
 		if fileErr != nil {
 			errorExit(fmt.Errorf("could not read file %s: %w", configPath, fileErr))
 		}
-		yamlErr := yaml.Unmarshal(configBytes, &conf)
+		yamlErr := yaml.Unmarshal(configBytes, &confs)
 		if yamlErr != nil {
 			errorExit(fmt.Errorf("could not parse yaml in file %s: %w", configPath, yamlErr))
 		}
-		fmt.Fprintln(flag.CommandLine.Output(), conf.AppId, conf.Mark, conf.Title)
 	} else if errors.Is(statErr, os.ErrNotExist) {
 		if appIdFlag == "" && markFlag == "" && titleFlag == "" {
 			fmt.Fprintf(
@@ -149,15 +148,17 @@ func main() {
 			)
 			os.Exit(1)
 		}
-		conf = floatConfig{
-			AppId: appIdFlag,
-			Mark:  markFlag,
-			Title: titleFlag,
+		confs = []floatConfig{
+			{
+				AppId: appIdFlag,
+				Mark:  markFlag,
+				Title: titleFlag,
+			},
 		}
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
-	handler, handlerErr := newWindowEventHandler(ctx, conf)
+	handler, handlerErr := newWindowEventHandler(ctx, confs)
 	if handlerErr != nil {
 		errorExit(handlerErr)
 	}
