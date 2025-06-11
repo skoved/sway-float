@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"slices"
 
 	"github.com/joshuarubin/go-sway"
 )
@@ -29,17 +30,18 @@ func (h windowEventHandler) Window(ctx context.Context, event sway.WindowEvent) 
 	if event.Container.Type == sway.NodeFloatingCon {
 		return
 	}
-	for _, conf := range h.confs {
-		if conf.match(event) {
-			replies, cmdErr := h.client.RunCommand(ctx, floatCmd)
-			if cmdErr != nil {
-				fmt.Fprintf(os.Stderr, "Could not run command '%s': %s\n", floatCmd, cmdErr.Error())
-			}
-			for _, reply := range replies {
-				if reply.Error != "" {
-					fmt.Printf("Command '%s' failed: %s\n", floatCmd, reply.Error)
-				}
-			}
+	// window does not match the config
+	if index := slices.IndexFunc(h.confs, func(conf floatConfig) bool { return conf.match(event) }); index < 0 {
+		return
+	}
+
+	replies, cmdErr := h.client.RunCommand(ctx, floatCmd)
+	if cmdErr != nil {
+		fmt.Fprintf(os.Stderr, "Could not run command '%s': %s\n", floatCmd, cmdErr.Error())
+	}
+	for _, reply := range replies {
+		if reply.Error != "" {
+			fmt.Printf("Command '%s' failed: %s\n", floatCmd, reply.Error)
 		}
 	}
 }
