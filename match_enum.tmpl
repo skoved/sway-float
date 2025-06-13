@@ -1,0 +1,11 @@
+// Returns the MatcherOption associated with me and true. If me is not a valid matcherEnum, false is returned
+func (me matcherEnum) toMatcher() (MatcherOption, bool) {
+	switch me {
+	{{- range $idx, $val := .enum.Values }}
+	case {{$val.PrefixedName}}:
+		return With{{$val.Name}}Matcher(), true
+	{{- end}}
+    default:
+        return nil, false
+	}
+}

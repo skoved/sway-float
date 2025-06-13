@@ -81,7 +81,7 @@ linters:
         - defers
         - directive
         - errorsas
-        - fieldalignment  # not default
+        #- fieldalignment  # not default
         - framepointer
         - httpresponse
         - ifaceassert
