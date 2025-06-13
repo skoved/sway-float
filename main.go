@@ -10,55 +10,11 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"slices"
 	"syscall"
-
-	"github.com/goccy/go-yaml"
-	"github.com/joshuarubin/go-sway"
 )
-
-const configDirSuffix = "sway-float/config.yaml"
 
 // set by the compiler
 var version string
-
-type floatConfig struct {
-	AppId string `yaml:"app_id"`
-	Mark  string `yaml:"con_mark"`
-	Title string `yaml:"title"`
-}
-
-func (c floatConfig) match(event sway.WindowEvent) bool {
-	if c.AppId == "" && c.Mark == "" && c.Title == "" {
-		return false
-	}
-	return c.appIdMatch(event) && c.markMatch(event) && c.titleMatch(event)
-}
-
-// should only be called by match
-func (c floatConfig) appIdMatch(event sway.WindowEvent) bool {
-	if c.AppId == "" {
-		return true
-	}
-	if event.Container.AppID == nil {
-		return false
-	}
-	return c.AppId == *event.Container.AppID
-}
-
-func (c floatConfig) markMatch(event sway.WindowEvent) bool {
-	if c.Mark == "" {
-		return true
-	}
-	return slices.Contains(event.Container.Marks, c.Mark)
-}
-
-func (c floatConfig) titleMatch(event sway.WindowEvent) bool {
-	if c.Title == "" {
-		return true
-	}
-	return c.Title == event.Container.Name
-}
 
 // Prints err to stderr and calls os.Exit with a non-zero status code
 func errorExit(err error) {
@@ -73,6 +29,7 @@ var (
 	appIdFlag   string
 	markFlag    string
 	titleFlag   string
+	matchFlag   string
 )
 
 // usage strings
@@ -82,6 +39,7 @@ const (
 	appIdUsage   = "specify the appId of the window you want to float"
 	markUsage    = "specify the con_mark of the window you want to float"
 	titleUsage   = "specify the title of the window you want to match"
+	matchUsage   = "specify how you want to match the title of windows. Valid options are: equal, prefix, suffix"
 )
 
 func setFlags() {
@@ -95,6 +53,8 @@ func setFlags() {
 	flag.StringVar(&markFlag, "c", "", markUsage+" (shorthand)")
 	flag.StringVar(&titleFlag, "title", "", titleUsage)
 	flag.StringVar(&titleFlag, "t", "", titleUsage+" (shorthand)")
+	flag.StringVar(&matchFlag, "match", "equal", matchUsage)
+	flag.StringVar(&matchFlag, "m", "equal", matchUsage+"(shorthand)")
 
 	flag.Parse()
 }
@@ -127,16 +87,7 @@ func main() {
 	configPath := configDir + "/" + configDirSuffix
 	fmt.Fprintln(os.Stderr, "reading config from:", configPath)
 	_, statErr := os.Stat(configPath)
-	if statErr == nil {
-		configBytes, fileErr := os.ReadFile(configPath) //gosec:disable G304 -- need to build the path to the config dir
-		if fileErr != nil {
-			errorExit(fmt.Errorf("could not read file %s: %w", configPath, fileErr))
-		}
-		yamlErr := yaml.Unmarshal(configBytes, &confs)
-		if yamlErr != nil {
-			errorExit(fmt.Errorf("could not parse yaml in file %s: %w", configPath, yamlErr))
-		}
-	} else if errors.Is(statErr, os.ErrNotExist) {
+	if errors.Is(statErr, os.ErrNotExist) {
 		if appIdFlag == "" && markFlag == "" && titleFlag == "" {
 			fmt.Fprintf(
 				flag.CommandLine.Output(),
@@ -148,12 +99,28 @@ func main() {
 			)
 			os.Exit(1)
 		}
+		me, meErr := ParsematcherEnum(matchFlag)
+		if meErr != nil {
+			errorExit(fmt.Errorf("invalid matcher %w", meErr))
+		}
+		opt, valid := me.toMatcher()
+		if !valid {
+			errorExit(errors.New("this should not happen"))
+		}
 		confs = []floatConfig{
-			{
-				AppId: appIdFlag,
-				Mark:  markFlag,
-				Title: titleFlag,
-			},
+			newFloatingConfig(appIdFlag, markFlag, titleFlag, opt),
+		}
+	} else if statErr != nil {
+		errorExit(fmt.Errorf("encountered an issue checking if config file %s exists: %w", configPath, statErr))
+	} else {
+		configBytes, fileErr := os.ReadFile(configPath) //gosec:disable G304 -- need to build the path to the config dir
+		if fileErr != nil {
+			errorExit(fmt.Errorf("could not read file %s: %w", configPath, fileErr))
+		}
+		var yamlErr error
+		confs, yamlErr = floatingConfigFromYaml(configBytes)
+		if yamlErr != nil {
+			errorExit(fmt.Errorf("could not parse yaml in file %s: %w", configPath, yamlErr))
 		}
 	}
 
